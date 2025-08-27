@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MindAR Cube Test</title>
+  <title>MindAR Chicken Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-  <!-- Importmap pour Three.js et MindAR -->
   <script type="importmap">
   {
     "imports": {
@@ -25,10 +24,11 @@
   <script type="module">
     import * as THREE from 'three';
     import { MindARThree } from 'mindar-image-three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     const mindARThree = new MindARThree({
       container: document.body,
-      imageTargetSrc: 'targets.mind', // ton fichier cible
+      imageTargetSrc: 'targets.mind',
     });
 
     const { renderer, scene, camera } = mindARThree;
@@ -38,21 +38,21 @@
     const loader = new GLTFLoader();
     loader.load('chicken.glb', (gltf) => {
       const chicken = gltf.scene;
-      chicken.scale.set(0.5, 0.5, 0.5);   // taille
-      chicken.position.set(0, 0, 0);       // position par rapport à l'anchor
+      chicken.scale.set(0.5, 0.5, 0.5);
+      chicken.position.set(0, 0, 0);
       anchor.group.add(chicken);
+    }, undefined, (error) => {
+      console.error('Erreur chargement GLB:', error);
     });
 
     // Démarrage MindAR
     mindARThree.start();
 
-    // Animation
+    // Animation : rotation de l’anchor
     renderer.setAnimationLoop(() => {
-      cube.rotation.y += 0.01;
-      cube.rotation.x += 0.01;
+      anchor.group.rotation.y += 0.01;
       renderer.render(scene, camera);
     });
   </script>
 </body>
 </html>
-
