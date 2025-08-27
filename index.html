@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MindAR Cube Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <!-- Import map pour Three.js et MindAR -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
+  }
+  </script>
+
+  <style>
+    body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+    canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import * as THREE from 'three';
+    import { MindARThree } from 'mindar-image-three';
+
+    // Initialisation de MindAR
+    const mindARThree = new MindARThree({
+      container: document.body,
+      imageTargetSrc: 'targets.mind', // ton fichier .mind
+    });
+
+    const { renderer, scene, camera } = mindARThree;
+
+    // Créer un anchor pour le premier target (id 0)
+    const anchor = mindARThree.addAnchor(0);
+
+    // Créer un cube vert
+    const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+
+    // Ajouter le cube à l’anchor
+    anchor.group.add(cube);
+
+    // Démarrer MindAR
+    mindARThree.start();
+
+    // Boucle d'animation (rotation du cube)
+    renderer.setAnimationLoop(() => {
+      cube.rotation.y += 0.01;
+      cube.rotation.x += 0.01;
+      renderer.render(scene, camera);
+    });
+  </script>
+</body>
+</html>
