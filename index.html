@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>MindAR Chicken Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
   <script type="importmap">
   {
     "imports": {
@@ -14,65 +13,60 @@
     }
   }
   </script>
-
   <style>
     body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
     canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
   </style>
 </head>
 <body>
-  <script type="module">
-    import * as THREE from 'three';
-    import { MindARThree } from 'mindar-image-three';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from 'mindar-image-three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    // --- Initialisation MindAR ---
-    const mindARThree = new MindARThree({
-      container: document.body,
-      imageTargetSrc: 'targets.mind',
-    });
-    const { renderer, scene, camera } = mindARThree;
+// --- Initialisation MindAR ---
+const mindARThree = new MindARThree({
+  container: document.body,
+  imageTargetSrc: 'targets.mind',
+});
+const { renderer, scene, camera } = mindARThree;
 
-    // --- Lumières ---
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(0, 1, 1);
-    scene.add(dirLight);
+// --- Lumières ---
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(0, 1, 1);
+scene.add(dirLight);
 
-    // --- Anchor ---
-    const anchor = mindARThree.addAnchor(0);
+// --- Anchor ---
+const anchor = mindARThree.addAnchor(0);
 
-    // --- Pivot pour le poulet ---
-    const pivot = new THREE.Object3D();
-    pivot.position.set(0, 0, 0);
-    anchor.group.add(pivot);
+// --- Créer un groupe interne pour le poulet ---
+const chickenGroup = new THREE.Group();
+anchor.group.add(chickenGroup);
 
-    // --- Charger le poulet ---
-    const loader = new GLTFLoader();
-    loader.load('chicken.glb', (gltf) => {
-      const chicken = gltf.scene;
+// --- Charger le poulet ---
+const loader = new GLTFLoader();
+loader.load('chicken.glb', (gltf) => {
+  const chicken = gltf.scene;
 
-      // --- Taille ---
-      const box = new THREE.Box3().setFromObject(chicken);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const desiredHeight = 1; // 1 mètre en AR
-      const scaleFactor = desiredHeight / size.y;
-      chicken.scale.setScalar(scaleFactor);
+  // --- Taille ---
+  const box = new THREE.Box3().setFromObject(chicken);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const desiredHeight = 1;
+  const scaleFactor = desiredHeight / size.y;
+  chicken.scale.setScalar(scaleFactor);
 
-      // --- Redresser ---
-      chicken.rotation.set(0, 0, 0); // bien debout
+  // --- Centrage ---
+  box.setFromObject(chicken);
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+  chicken.position.sub(center); // centre le poulet dans le groupe
 
-      // --- Centrage ---
-      box.setFromObject(chicken);
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      chicken.position.sub(center); // centre le poulet sur le pivot
+  chickenGroup.add(chicken);
+});
 
-      pivot.add(chicken);
-    });
-
-// Rotation libre via drag
+// --- Drag pour rotation libre ---
 let isDragging = false;
 let prevX = 0;
 let prevY = 0;
@@ -88,22 +82,24 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   const deltaX = e.clientX - prevX;
   const deltaY = e.clientY - prevY;
 
-  pivot.rotation.y += deltaX * 0.01;
-  pivot.rotation.x += deltaY * 0.01;
-  pivot.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pivot.rotation.x));
+  chickenGroup.rotation.y += deltaX * 0.01; // rotation horizontale
+  chickenGroup.rotation.x += deltaY * 0.01; // rotation verticale
+  chickenGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, chickenGroup.rotation.x));
 
   prevX = e.clientX;
   prevY = e.clientY;
 });
 
 renderer.domElement.addEventListener('pointerup', () => { isDragging = false; });
-renderer.domElement.addEventListener('pointerleave', () => { isDragging = false; });    // --- Démarrage AR ---
-    mindARThree.start();
+renderer.domElement.addEventListener('pointerleave', () => { isDragging = false; });
 
-    // --- Boucle de rendu ---
-    renderer.setAnimationLoop(() => {
-      renderer.render(scene, camera);
-    });
-  </script>
+// --- Démarrage MindAR ---
+mindARThree.start();
+
+// --- Boucle de rendu ---
+renderer.setAnimationLoop(() => {
+  renderer.render(scene, camera);
+});
+</script>
 </body>
 </html>
