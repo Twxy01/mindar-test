@@ -25,25 +25,30 @@
     import * as THREE from 'three';
     import { MindARThree } from 'mindar-image-three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-    
+
     // Initialisation MindAR
     const mindARThree = new MindARThree({
       container: document.body,
       imageTargetSrc: 'targets.mind',
     });
-    
+
     const { renderer, scene, camera } = mindARThree;
+
+    // Lumières
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(0, 1, 1);
+    scene.add(dirLight);
+
+    // Création d'un anchor pour le poulet et debug
     const anchor = mindARThree.addAnchor(0);
-    
-    // Ajout de lumière dans la scène
-    const light = new THREE.AmbientLight(0x404040, 10);
-    scene.add(light);
 
-    // Grid helper pour debug
+    // GridHelper attaché à l'anchor pour debug
     const grid = new THREE.GridHelper(1, 10);
-    scene.add(grid);
+    anchor.group.add(grid);
 
-    // Charger le modèle 3D
+    // Loader GLTF
     const loader = new GLTFLoader();
     loader.load(
       'chicken.glb',
@@ -54,22 +59,26 @@
         const box = new THREE.Box3().setFromObject(chicken);
         const size = new THREE.Vector3();
         box.getSize(size);
-        console.log("Taille originale du poulet :", size);
+        console.log("Taille originale du poulet :", size.x, size.y, size.z);
 
-        // Positionnement et taille du poulet
+        // Ajuster taille
         const desiredHeight = 0.5;
         const scaleFactor = desiredHeight / size.y;
         chicken.scale.setScalar(scaleFactor * 1.5);
 
-        // Ajouter AxesHelper au poulet pour debug
-        const axes = new THREE.AxesHelper(0.5);
-        chicken.add(axes);
+        // Redresser le poulet
+        chicken.rotation.x = -Math.PI / 2;
 
-        // Centrer le poulet
+        // Centrer
         box.setFromObject(chicken);
         box.getCenter(chicken.position).multiplyScalar(-1);
-        chicken.position.y = -0.5; // optionnel : descendre un peu
+        chicken.position.y -= 0.3; // ajustable
 
+        // AxesHelper pour debug
+        const axes = new THREE.AxesHelper(0.2);
+        chicken.add(axes);
+
+        // Ajouter le poulet à l'anchor
         anchor.group.add(chicken);
       },
       undefined,
