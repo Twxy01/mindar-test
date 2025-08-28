@@ -40,13 +40,9 @@ scene.add(dirLight);
 // --- Anchor ---
 const anchor = mindARThree.addAnchor(0);
 
-// --- Créer un groupe parent pour rotation horizontale ---
+// --- Créer un groupe interne pour le poulet ---
 const chickenGroup = new THREE.Group();
 anchor.group.add(chickenGroup);
-
-// --- Créer un sous-groupe pour le poulet debout ---
-const chickenInnerGroup = new THREE.Group();
-chickenGroup.add(chickenInnerGroup);
 
 // --- Charger le poulet ---
 const loader = new GLTFLoader();
@@ -60,18 +56,17 @@ loader.load('chicken.glb', (gltf) => {
   const desiredHeight = 1;
   const scaleFactor = desiredHeight / size.y;
   chicken.scale.setScalar(scaleFactor);
-
+  
+  
   // --- Centrage ---
   box.setFromObject(chicken);
   const center = new THREE.Vector3();
   box.getCenter(center);
-  chicken.position.sub(center);
+  chicken.position.sub(center); // centre le poulet dans le groupe
+  
+  chicken.rotation.x = Math.PI / 2; // ou Math.PI / 2 selon le sens
 
-  // --- Rotation pour le remettre debout ---
-  chicken.rotation.x = -Math.PI / 2;
-
-  // --- Ajouter le poulet dans le sous-groupe ---
-  chickenInnerGroup.add(chicken);
+  chickenGroup.add(chicken);
 });
 
 // --- Mobile touch controls ---
@@ -84,11 +79,11 @@ let initialScale = 1;
 const container = mindARThree.container;
 
 container.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1 && anchor.visible) {
+  if (e.touches.length === 1 && anchor.visible) { // un doigt + ancre visible
     isDragging = true;
     prevX = e.touches[0].clientX;
     prevY = e.touches[0].clientY;
-  } else if (e.touches.length === 2) {
+  } else if (e.touches.length === 2) { // deux doigts = pinch
     isDragging = false;
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -98,18 +93,15 @@ container.addEventListener('touchstart', (e) => {
 });
 
 container.addEventListener('touchmove', (e) => {
-  e.preventDefault();
+  e.preventDefault(); // empêche le scroll
 
   if (isDragging && e.touches.length === 1 && anchor.visible) {
     const deltaX = e.touches[0].clientX - prevX;
     const deltaY = e.touches[0].clientY - prevY;
 
-    // Rotation horizontale du groupe parent
     chickenGroup.rotation.y += deltaX * 0.01;
-
-    // Rotation verticale limitée du sous-groupe
-    chickenInnerGroup.rotation.x += deltaY * 0.01;
-    chickenInnerGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, chickenInnerGroup.rotation.x));
+    chickenGroup.rotation.x += deltaY * 0.01;
+    chickenGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, chickenGroup.rotation.x));
 
     prevX = e.touches[0].clientX;
     prevY = e.touches[0].clientY;
