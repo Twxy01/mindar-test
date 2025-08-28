@@ -49,43 +49,41 @@
     anchor.group.add(grid);
 
     // Loader GLTF
-    const loader = new GLTFLoader();
-    loader.load(
-      'chicken.glb',
-      (gltf) => {
-        const chicken = gltf.scene;
+const loader = new GLTFLoader();
+loader.load('chicken.glb', (gltf) => {
+  const chicken = gltf.scene;
 
-        // Calculer les dimensions réelles
-        const box = new THREE.Box3().setFromObject(chicken);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-        console.log("Taille originale du poulet :", size.x, size.y, size.z);
+  // Calculer les dimensions du modèle
+  const box = new THREE.Box3().setFromObject(chicken);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  console.log("Taille originale du poulet :", size.x, size.y, size.z);
 
-        // Ajuster taille
-        const desiredHeight = 0.5;
-        const scaleFactor = desiredHeight / size.y;
-        chicken.scale.setScalar(scaleFactor * 1.5);
+  // Ajuster la taille du poulet
+  const desiredHeight = 0.5; // 50 cm
+  const scaleFactor = desiredHeight / size.y;
+  chicken.scale.setScalar(scaleFactor);
 
-        // Redresser le poulet
-        chicken.rotation.x = -Math.PI / 2;
+  // REDRESSER le poulet sur ses pattes
+  chicken.rotation.x = -Math.PI / 2; // rotation sur X
+  chicken.rotation.z = Math.PI;      // rotation sur Z si nécessaire
 
-        // Centrer
-        box.setFromObject(chicken);
-        box.getCenter(chicken.position).multiplyScalar(-1);
-        chicken.position.y -= 0.3; // ajustable
+  // Centrer le poulet
+  box.setFromObject(chicken);
+  box.getCenter(chicken.position).multiplyScalar(-1);
+  chicken.position.y -= 0.25; // ajuster pour qu'il touche le sol
 
-        // AxesHelper pour debug
-        const axes = new THREE.AxesHelper(0.2);
-        chicken.add(axes);
+  // Ajouter AxesHelper pour debug
+  const axes = new THREE.AxesHelper(0.1); // taille proportionnelle au poulet
+  chicken.add(axes);
 
-        // Ajouter le poulet à l'anchor
-        anchor.group.add(chicken);
-      },
-      undefined,
-      (error) => {
-        console.error('Erreur chargement GLB:', error);
-      }
-    );
+  // Ajouter le poulet à l'anchor
+  anchor.group.add(chicken);
+
+  // Ajouter GridHelper à l'anchor pour debug
+  const grid = new THREE.GridHelper(1, 10);
+  anchor.group.add(grid);
+});
 
     // Démarrage MindAR
     mindARThree.start().then(() => {
