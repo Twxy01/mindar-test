@@ -44,9 +44,7 @@
     // Création d'un anchor pour le poulet et debug
     const anchor = mindARThree.addAnchor(0);
 
-    // GridHelper attaché à l'anchor pour debug
-    const grid = new THREE.GridHelper(1, 10);
-    anchor.group.add(grid);
+
 
     // Loader GLTF
 const loader = new GLTFLoader();
@@ -65,15 +63,15 @@ loader.load('chicken.glb', (gltf) => {
   chicken.scale.setScalar(scaleFactor);
 
   // REDRESSER le poulet sur ses pattes
-  chicken.rotation.x = -Math.PI / 2; // rotation sur X
   chicken.rotation.z = Math.PI;      // rotation sur Z si nécessaire
+
 
   // Ajouter AxesHelper pour debug
   const axes = new THREE.AxesHelper(0.1); // taille proportionnelle au poulet
   chicken.add(axes);
   const pivot = new THREE.Object3D();
   pivot.add(chicken);
-  pivot.position.set(0, -0.25, 0); // centrer sur le marqueur
+  pivot.position.set(0, -0.5, 0); // centrer sur le marqueur
   anchor.group.add(pivot);
 });
 
