@@ -39,6 +39,10 @@
     const light = new THREE.AmbientLight(0x404040, 10);
     scene.add(light);
 
+    // Grid helper pour debug
+    const grid = new THREE.GridHelper(1, 10);
+    scene.add(grid);
+
     // Charger le modèle 3D
     const loader = new GLTFLoader();
     loader.load(
@@ -56,7 +60,10 @@
         const desiredHeight = 0.5;
         const scaleFactor = desiredHeight / size.y;
         chicken.scale.setScalar(scaleFactor * 1.5);
-        chicken.rotation.x
+
+        // Ajouter AxesHelper au poulet pour debug
+        const axes = new THREE.AxesHelper(0.5);
+        chicken.add(axes);
 
         // Centrer le poulet
         box.setFromObject(chicken);
@@ -70,14 +77,6 @@
         console.error('Erreur chargement GLB:', error);
       }
     );
-
-    //debug
-    const grid = new THREE.GridHelper(1,10)
-    scene.add(grid)
-
-    const axes = new THREE.AxesHelper(0,5)
-    chicken.add(axes)
-
 
     // Démarrage MindAR
     mindARThree.start().then(() => {
