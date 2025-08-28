@@ -51,27 +51,28 @@ const loader = new GLTFLoader();
 loader.load('chicken.glb', (gltf) => {
   const chicken = gltf.scene;
 
-  // Calculer les dimensions du modèle
+  // Dimensions du modèle
   const box = new THREE.Box3().setFromObject(chicken);
   const size = new THREE.Vector3();
   box.getSize(size);
   console.log("Taille originale du poulet :", size.x, size.y, size.z);
 
-  // Ajuster la taille du poulet
-  const desiredHeight = 0.5; // 50 cm
+  // Ajuster la taille
+  const desiredHeight = 0.5;
   const scaleFactor = desiredHeight / size.y;
   chicken.scale.setScalar(scaleFactor);
 
-  // REDRESSER le poulet sur ses pattes
-  chicken.rotation.z = Math.PI;      // rotation sur Z si nécessaire
+  // Redresser le poulet
+  chicken.rotation.x = -Math.PI / 2;
+  chicken.rotation.z = Math.PI;
 
-
-  // Ajouter AxesHelper pour debug
-  const axes = new THREE.AxesHelper(0.1); // taille proportionnelle au poulet
-  chicken.add(axes);
+  // Créer un pivot pour recentrer et ajouter axes
   const pivot = new THREE.Object3D();
   pivot.add(chicken);
-  pivot.position.set(0, -0.5, 0); // centrer sur le marqueur
+  const axes = new THREE.AxesHelper(0.1);
+  pivot.add(axes);
+
+  pivot.position.set(0, -0.25, 0); // ajuster pour que poulet touche le marqueur
   anchor.group.add(pivot);
 });
 
