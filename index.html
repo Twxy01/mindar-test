@@ -57,14 +57,13 @@ loader.load('chicken.glb', (gltf) => {
   const scaleFactor = desiredHeight / size.y;
   chicken.scale.setScalar(scaleFactor);
   
-  
+  chicken.rotation.x = Math.PI / 2; // ou Math.PI / 2 selon le sens
+
   // --- Centrage ---
   box.setFromObject(chicken);
   const center = new THREE.Vector3();
   box.getCenter(center);
   chicken.position.sub(center); // centre le poulet dans le groupe
-  
-  chicken.rotation.x = Math.PI / 2; // ou Math.PI / 2 selon le sens
 
   chickenGroup.add(chicken);
 });
