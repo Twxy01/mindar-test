@@ -37,20 +37,34 @@
 
     // Charger le modèle 3D
     const loader = new GLTFLoader();
-    loader.load(
-      'chicken.glb',
-      (gltf) => {
-        const chicken = gltf.scene;
-        chicken.scale.set(0.01, 0.01, 0.01);
-        chicken.position.set(0, -0.5, 0);
-        anchor.group.add(chicken);
-      },
-      undefined,
-      (error) => {
-        console.error('Erreur chargement GLB:', error);
-      }
-    );
+loader.load(
+  'chicken.glb',
+  (gltf) => {
+    const chicken = gltf.scene;
 
+    // Calculer les dimensions réelles
+    const box = new THREE.Box3().setFromObject(chicken);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    console.log("Taille originale du poulet :", size);
+
+    // On veut que le poulet fasse environ 0.3 m (30 cm) de haut
+    const desiredHeight = 0.3;
+    const scaleFactor = desiredHeight / size.y;
+    chicken.scale.setScalar(scaleFactor);
+
+    // Centrer le poulet
+    box.setFromObject(chicken);
+    box.getCenter(chicken.position).multiplyScalar(-1);
+    chicken.position.y = -0.5; // optionnel : descendre un peu
+
+    anchor.group.add(chicken);
+  },
+  undefined,
+  (error) => {
+    console.error('Erreur chargement GLB:', error);
+  }
+);
     // Démarrage MindAR
     mindARThree.start().then(() => {
       console.log("MindAR démarré ✅");
