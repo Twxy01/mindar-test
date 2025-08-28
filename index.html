@@ -56,6 +56,11 @@ loader.load('chicken.glb', (gltf) => {
   const desiredHeight = 1;
   const scaleFactor = desiredHeight / size.y;
   chicken.scale.setScalar(scaleFactor);
+  
+  //Position du poulet
+  chicken.rotation.x = -Math.PI / 2;
+  chicken.rotation.z = Math.PI;
+  chicken.roation.y = -Math.PI/2
 
   // --- Centrage ---
   box.setFromObject(chicken);
