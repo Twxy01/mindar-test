@@ -58,14 +58,14 @@ loader.load('chicken.glb', (gltf) => {
   console.log("Taille originale du poulet :", size.x, size.y, size.z);
 
   // Ajuster la taille
-  const desiredHeight = 0.5;
+  const desiredHeight = 1;
   const scaleFactor = desiredHeight / size.y;
   chicken.scale.setScalar(scaleFactor);
 
   // rotation du poulet
   chicken.rotation.x = -Math.PI / 2;
   chicken.rotation.z = Math.PI;
-  chicken.rotation.y = -Math.PI/2
+  chicken.rotation.y = Math.PI/2
   // Créer un pivot pour recentrer et ajouter axes
   const pivot = new THREE.Object3D();
   pivot.add(chicken);
