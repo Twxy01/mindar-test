@@ -44,13 +44,7 @@
     // Anchor
     const anchor = mindARThree.addAnchor(0);
 
-    // OrbitControls (pour tourner librement le poulet avec le doigt)
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = true;
-    controls.enablePan = false; 
-    controls.enableRotate = true;
-
-    // Loader GLTF
+    // Loader du poulet
     const loader = new GLTFLoader();
     loader.load('chicken.glb', (gltf) => {
       const chicken = gltf.scene;
@@ -59,8 +53,6 @@
       const box = new THREE.Box3().setFromObject(chicken);
       const size = new THREE.Vector3();
       box.getSize(size);
-      console.log("Taille originale du poulet :", size.x, size.y, size.z);
-
       const desiredHeight = 1;
       const scaleFactor = desiredHeight / size.y;
       chicken.scale.setScalar(scaleFactor);
@@ -68,27 +60,27 @@
       // Redresser
       chicken.rotation.x = -Math.PI / 2;
 
-      // Pivot
+      // Pivot pour rotation locale
       const pivot = new THREE.Object3D();
       pivot.add(chicken);
-      const axes = new THREE.AxesHelper(0.1);
-      pivot.add(axes);
-
       pivot.position.set(0, -0.25, 0);
       anchor.group.add(pivot);
 
-      // Centrage OrbitControls
-      controls.target.copy(pivot.position);
+      // OrbitControls appliqué sur le pivot (pas la caméra)
+      const controls = new OrbitControls(pivot, renderer.domElement);
+      controls.enableZoom = true;
+      controls.enablePan = false;
+      controls.enableRotate = true;
+
+      // Animation
+      renderer.setAnimationLoop(() => {
+        controls.update();
+        renderer.render(scene, camera);
+      });
     });
 
-    // Start AR
+    // Démarrage AR
     mindARThree.start();
-
-    // Animation Loop
-    renderer.setAnimationLoop(() => {
-      controls.update();
-      renderer.render(scene, camera);
-    });
   </script>
 </body>
 </html>
