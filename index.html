@@ -76,7 +76,7 @@ let initialScale = 1;
 const container = mindARThree.container;
 
 container.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) { // un doigt = rotation
+  if (e.touches.length === 1 && anchor.visible) { // un doigt + ancre visible
     isDragging = true;
     prevX = e.touches[0].clientX;
     prevY = e.touches[0].clientY;
@@ -92,7 +92,7 @@ container.addEventListener('touchstart', (e) => {
 container.addEventListener('touchmove', (e) => {
   e.preventDefault(); // empêche le scroll
 
-  if (isDragging && e.touches.length === 1) {
+  if (isDragging && e.touches.length === 1 && anchor.visible) {
     const deltaX = e.touches[0].clientX - prevX;
     const deltaY = e.touches[0].clientY - prevY;
 
