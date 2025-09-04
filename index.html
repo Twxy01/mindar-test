@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MindAR Chicken Test</title>
+  <title>MindAR Directional Arrow Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <script type="importmap">
   {
@@ -40,33 +40,34 @@ scene.add(dirLight);
 // --- Anchor ---
 const anchor = mindARThree.addAnchor(0);
 
-// --- Créer un groupe interne pour le poulet ---
-const chickenGroup = new THREE.Group();
-anchor.group.add(chickenGroup);
+// --- Créer un groupe interne pour la flèche ---
+const arrowGroup = new THREE.Group();
+anchor.group.add(arrowGroup);
 
-// --- Charger le poulet ---
-const loader = new GLTFLoader();
-loader.load('direction_arrow.glb', (gltf) => {
-  const chicken = gltf.scene;
-
-  // --- Taille ---
-  const box = new THREE.Box3().setFromObject(chicken);
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  const desiredHeight = 1;
-  const scaleFactor = desiredHeight / size.y;
-  chicken.scale.setScalar(scaleFactor);
+// --- Créer une flèche directionnelle avec THREE.js ---
+const createArrow = () => {
+  const arrowLength = 2;  // Longueur de la flèche
+  const arrowRadius = 0.05;  // Rayon de la tige de la flèche
+  const headLength = 0.4;  // Longueur de la tête de la flèche
+  const headWidth = 0.2;  // Largeur de la tête de la flèche
   
-  chicken.rotation.x = Math.PI / 2; // ou Math.PI / 2 selon le sens
+  // Tige de la flèche
+  const shaftGeometry = new THREE.CylinderGeometry(arrowRadius, arrowRadius, arrowLength);
+  const shaftMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });  // Bleu
+  const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
+  shaft.rotation.z = Math.PI / 2;  // Orientation de la tige
+  arrowGroup.add(shaft);
 
-  // --- Centrage ---
-  box.setFromObject(chicken);
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-  chicken.position.sub(center); // centre le poulet dans le groupe
+  // Tête de la flèche
+  const headGeometry = new THREE coneGeometry(headWidth, headLength);
+  const headMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+  const head = new THREE.Mesh(headGeometry, headMaterial);
+  head.position.set(0, arrowLength / 2 + headLength / 2, 0); // Positionner la tête à l'extrémité de la tige
+  arrowGroup.add(head);
+};
 
-  chickenGroup.add(chicken);
-});
+// Créer la flèche
+createArrow();
 
 // --- Mobile touch controls ---
 let isDragging = false;
@@ -87,7 +88,7 @@ container.addEventListener('touchstart', (e) => {
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
     initialDistance = Math.hypot(dx, dy);
-    initialScale = chickenGroup.scale.x;
+    initialScale = arrowGroup.scale.x;
   }
 });
 
@@ -98,9 +99,9 @@ container.addEventListener('touchmove', (e) => {
     const deltaX = e.touches[0].clientX - prevX;
     const deltaY = e.touches[0].clientY - prevY;
 
-    chickenGroup.rotation.y += deltaX * 0.01;
-    chickenGroup.rotation.x += deltaY * 0.01;
-    chickenGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, chickenGroup.rotation.x));
+    arrowGroup.rotation.y += deltaX * 0.01;
+    arrowGroup.rotation.x += deltaY * 0.01;
+    arrowGroup.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, arrowGroup.rotation.x));
 
     prevX = e.touches[0].clientX;
     prevY = e.touches[0].clientY;
@@ -110,7 +111,7 @@ container.addEventListener('touchmove', (e) => {
     const distance = Math.hypot(dx, dy);
     const scaleFactor = distance / initialDistance;
 
-    chickenGroup.scale.setScalar(initialScale * scaleFactor);
+    arrowGroup.scale.setScalar(initialScale * scaleFactor);
   }
 }, { passive: false });
 
@@ -127,9 +128,4 @@ renderer.setAnimationLoop(() => {
 });
 </script>
 </body>
-
 </html>
-
-
-
-
